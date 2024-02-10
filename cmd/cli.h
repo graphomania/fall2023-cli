@@ -12,6 +12,7 @@
 #include <memory>
 #include <functional>
 #include <ranges>
+#include <fstream>
 
 
 std::vector<std::string> stringify(const int argc, char* argv[]) {
@@ -143,11 +144,11 @@ public:
                     auto [min, min_val] = method->minimal(func.get(), area);
 
                     auto [closest, closest_val] = func->closest_minimal(min);
-                    fmt::print("Function: {} | Method: {}\n"
+                    fmt::print("Function: {} in {} | Method: {}\n"
                                "\tResults in minimum at x={}, f(x)={} (in {} steps).\n"
                                "\tThe closest theoretically known local minimum: y={}, f(y)={}\n"
                                "\t||(x, f(x)) - (y, f(y))|| = {}))\n",
-                               func->name(), method->name(),
+                               func->name(), area.to_string(), method->name(),
                                min, min_val, method->steps_took(),
                                closest, closest_val,
                                min.dist_with(closest, [func](const auto&p) { return (*func)(p); })
@@ -179,6 +180,46 @@ std::string __________________________join(const std::vector<std::string>&vec, c
     return ret;
 }
 
+// clearly copypasted
+std::vector<std::string> customSplit(const std::string&str, const char sep) {
+    std::vector<std::string> ret;
+    int startIndex = 0, endIndex = 0;
+    for (int i = 0; i <= str.size(); i++) {
+        if (str[i] == sep || i == str.size()) {
+            endIndex = i;
+            std::string temp;
+            temp.append(str, startIndex, endIndex - startIndex);
+            ret.push_back(temp);
+            startIndex = endIndex + 1;
+        }
+    }
+    return ret;
+}
+
+template<typename T, typename Func>
+std::vector<T> _____map(std::vector<T> what, Func func) {
+    for (size_t i = 0; i < what.size(); i++) {
+        what[i] = func(what[i]);
+    }
+    return what; // RAII, i hope
+}
+
+std::string ________left_pad_single(const std::string&what, const size_t size,
+                                    const char filler = ' ', const char sep = '\n') {
+    if (what.size() > size) {
+        return what + filler;
+    }
+    return what + std::string(size - what.size(), filler);
+}
+
+std::string ________left_pad(const std::string&what, const size_t size) {
+    return __________________________join(
+        _____map(
+            customSplit(what, '\n'),
+            [size](auto val) -> auto { return ________left_pad_single(val, size); }
+        ), "\n");
+}
+
 int cli_app(int argc, char* argv[]) {
     auto cli = CLI{
         {
@@ -208,7 +249,9 @@ int cli_app(int argc, char* argv[]) {
                     cli.functions.emplace_back(std::make_shared<HimmelblauFunction>());
                 },
                 {"-H", "--himmelblau"}, 1,
-                fmt::format("FUNCTION: {}, has {} known local minimals {}, NOTE: usable only in R^2",
+                fmt::format("FUNCTION: {}, NOTE: usable only in R^2.\n"
+                            "                                    Has {} known local minimals: {}.\n"
+                            "                                    WIKI: https://en.wikipedia.org/wiki/Himmelblau%27s_function",
                             HimmelblauFunction().name(),
                             HimmelblauFunction().minimal().size(),
                             HimmelblauFunction().minimal()
@@ -229,7 +272,9 @@ int cli_app(int argc, char* argv[]) {
                 },
                 {"-R", "--rastrigin"}, 2,
                 fmt::format(
-                    "FUNCTION: {}, has {} known local minimals {}, REQUIRES: <N> -- additional dimension size hint",
+                    "FUNCTION: {}, REQUIRES: <N> -- additional dimension size hint.\n"
+                    "                                    Has {} known local minimal: {}.\n"
+                    "                                    WIKI: https://en.wikipedia.org/wiki/Rastrigin_function",
                     RastriginFunction(3).name(),
                     RastriginFunction(3).minimal().size(),
                     RastriginFunction(3).minimal()
@@ -254,7 +299,6 @@ int cli_app(int argc, char* argv[]) {
                     double min = -5;
                     double max = 5;
 
-                    auto size = 2;
                     if (args.size() > 1) {
                         auto [size_, valid] = CLI::parse_int<std::size_t>(args[1], CLI::positive);
                         if (!valid) {
@@ -279,7 +323,25 @@ int cli_app(int argc, char* argv[]) {
                     cli.area = Area::cube(dimensions, min, max);
                 },
                 {"-a", "--area"}, 4,
-                "cubic area info, REQUIRES: subarguments <DIMENSIONS> <MINIMUM> <MAXIMUM>"
+                "cubic area info, REQUIRES: subarguments <DIMENSIONS> <MINIMUM> <MAXIMUM> (default: [-5, 5]x[-5, 5])"
+            },
+
+            // Area custom
+            CLI::Argument{
+                [](CLI&cli, std::vector<std::string> args) {
+                    std::string filename = args[1];
+                    std::ifstream fin(filename);
+                    size_t dimensions;
+                    fin >> dimensions;
+                    std::vector<double> min(dimensions), max(dimensions);
+                    for (size_t i = 0; i < dimensions; i++) {
+                        fin >> min[i] >> max[i];
+                    }
+
+                    cli.area = Area({min}, {max});
+                },
+                {"-ac", "--area-custom"}, 2,
+                R"(read custom area bounds from subargument <FILE>, which has to be formatted as '<DIMENSIONS>\n<MIN> <MAX>\n<MIN> <MAX>\n...')"
             },
 
             // Seed
@@ -298,14 +360,24 @@ int cli_app(int argc, char* argv[]) {
                     std::string message;
 
                     std::vector<std::string> arguments_help;
-                    for (auto arg: cli.allowed_arguments()) {
-                        arguments_help.push_back(fmt::format("  {}\t  ---  {}",
-                                                             __________________________join(arg.alisases, ", "),
-                                                             arg.help
+                    size_t max_aliases_len = 0;
+                    for (const auto&arg: cli.allowed_arguments()) {
+                        max_aliases_len = std::max(__________________________join(arg.alisases, ", ").size(),
+                                                   max_aliases_len);
+                    }
+
+                    for (const auto&arg: cli.allowed_arguments()) {
+                        arguments_help.push_back(fmt::format("  {}  ---  {}",
+                                                             ________left_pad(
+                                                                 __________________________join(arg.alisases, ", "),
+                                                                 max_aliases_len), arg.help
+
                         ));
                     }
 
-                    fmt::print("{}\n", __________________________join(arguments_help, "\n"));
+                    fmt::print("Usage: ./fall2023 <METHODS> <FUCNTIONS> <OPTIONS>\n"
+                               "Arguments:\n"
+                               "{}\n", __________________________join(arguments_help, "\n"));
 
                     exit(0);
                 },
@@ -319,6 +391,5 @@ int cli_app(int argc, char* argv[]) {
     cli.parse(args);
     return cli();
 }
-
 
 #endif //CLI_H
