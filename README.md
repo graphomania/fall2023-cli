@@ -2,14 +2,34 @@
 
 Simpler implementation of Nelder–Mead algorithm.
 
-The Nelder–Mead method (also downhill simplex method, amoeba method, or polytope method) is a numerical method used to
+> The Nelder–Mead method (also downhill simplex method, amoeba method, or polytope method) is a numerical method used to
 find
 the minimum or maximum of an objective function in a multidimensional space. It is a direct search method (based on
 function
 comparison) and is often applied to nonlinear optimization problems for which derivatives may not be known.
 
+## Brief code structure and class hierarchy
+
+* (`NelderMead`, `RandomWalk`)  <--  `Method` -- optimisation methods
+* (`HimmelblauFunction`, `RastriginFunction`)  <-- `Function`  <-- `FunctionI` -- test functions with known minimals
+* `Point`  <--  `std::vector` -- well, it's a pointy extension of `std::vector`
+* `Area` -- continuous area and related functions to generate/check a `Point` within
+
+---
+
+* `log.h`    -- minimal implementation of logger, used in methods
+* `random.h` -- wrappers around `std::mt19937_64` for simpler global random management
+
+## Docs
+
+To generate docs use:
+```shell
+bash ./scripts/generate_docs.sh
+```
+
 ## Usage
 
+In terminal:
 ```
 Usage: ./fall2023 <METHODS> <FUCNTIONS> <OPTIONS>
 Arguments:

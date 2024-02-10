@@ -11,7 +11,6 @@
 #include <vector>
 #include <memory>
 #include <functional>
-#include <ranges>
 #include <fstream>
 
 
@@ -166,9 +165,9 @@ public:
     }
 };
 
-// this is a joke. not a funny one, but I've cracked a smile. warning: this is a reserved identifier.
-// std::ostringstream would be more optimal, but this is not a bottleneck for sure.
-// std::views::join source code is lovely, just look at it for a moment. tabulation with negative 2 spaces is the cherry on top.
+/// this is a joke. not a funny one, but I've cracked a smile. warning: this is a reserved identifier.
+/// std::ostringstream would be more optimal, but this is not a bottleneck for sure.
+/// std::views::join source code is lovely, just look at it for a moment. tabulation with negative 2 spaces is the cherry on top.
 std::string __________________________join(const std::vector<std::string>&vec, const std::string_view sep) {
     std::string ret;
     for (size_t i = 0; i < vec.size(); i++) {
@@ -180,7 +179,7 @@ std::string __________________________join(const std::vector<std::string>&vec, c
     return ret;
 }
 
-// clearly copypasted
+/// clearly copypasted
 std::vector<std::string> customSplit(const std::string&str, const char sep) {
     std::vector<std::string> ret;
     int startIndex = 0, endIndex = 0;
