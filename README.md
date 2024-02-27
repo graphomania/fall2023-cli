@@ -3,10 +3,10 @@
 Simpler implementation of Nelder–Mead algorithm.
 
 > The Nelder–Mead method (also downhill simplex method, amoeba method, or polytope method) is a numerical method used to
-find
-the minimum or maximum of an objective function in a multidimensional space. It is a direct search method (based on
-function
-comparison) and is often applied to nonlinear optimization problems for which derivatives may not be known.
+> find
+> the minimum or maximum of an objective function in a multidimensional space. It is a direct search method (based on
+> function
+> comparison) and is often applied to nonlinear optimization problems for which derivatives may not be known.
 
 ## Brief code structure and class hierarchy
 
@@ -23,6 +23,7 @@ comparison) and is often applied to nonlinear optimization problems for which de
 ## Docs
 
 To generate docs use:
+
 ```shell
 bash ./scripts/generate_docs.sh
 ```
@@ -30,6 +31,7 @@ bash ./scripts/generate_docs.sh
 ## Usage
 
 In terminal:
+
 ```
 Usage: ./fall2023 <METHODS> <FUCNTIONS> <OPTIONS>
 Arguments:

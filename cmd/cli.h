@@ -26,10 +26,10 @@ int cli_app(int argc, char* argv[]);
 
 class CLI {
 public:
-    template<typename T, typename ExtrapolatedT>
+    template <typename T, typename ExtrapolatedT>
     static std::pair<T, bool>
-    parse(const std::string&from,
-          const std::function<bool(ExtrapolatedT val)>&validate = [](ExtrapolatedT val) -> bool { return true; }) {
+    parse(const std::string& from,
+          const std::function<bool(ExtrapolatedT val)>& validate = [](ExtrapolatedT val) -> bool { return true; }) {
         ExtrapolatedT i;
 
         std::istringstream iss(from);
@@ -43,16 +43,16 @@ public:
     }
 
 
-    template<typename T>
+    template <typename T>
     static std::pair<T, bool>
-    parse_int(const std::string&from,
-              const std::function<bool(std::int64_t val)>&validate = [](std::int64_t val) -> bool { return true; }) {
+    parse_int(const std::string& from,
+              const std::function<bool(std::int64_t val)>& validate = [](std::int64_t val) -> bool { return true; }) {
         return CLI::parse<T, std::int64_t>(from, validate);
     }
 
     static std::pair<double, bool>
-    parse_double(const std::string&from,
-                 const std::function<bool(double val)>&validate = [](double val) -> bool { return true; }) {
+    parse_double(const std::string& from,
+                 const std::function<bool(double val)>& validate = [](double val) -> bool { return true; }) {
         return CLI::parse<double, double>(from, validate);
     }
 
@@ -60,7 +60,7 @@ public:
 
     class Argument {
     public:
-        using OnParse = void(CLI&cli, std::vector<std::string> args);
+        using OnParse = void(CLI& cli, std::vector<std::string> args);
 
         std::vector<std::string> alisases;
         std::function<OnParse> on_parse;
@@ -69,7 +69,7 @@ public:
         std::string help;
 
         /*implicit*/
-        Argument(OnParse on_parse, const std::vector<std::string>&alisases_, size_t argc = 1, std::string help = "")
+        Argument(OnParse on_parse, const std::vector<std::string>& alisases_, size_t argc = 1, std::string help = "")
             : alisases(alisases_), on_parse(on_parse), argc(argc) {
             this->help = std::move(help);
         }
@@ -77,11 +77,11 @@ public:
 
 private:
     std::vector<CLI::Argument> allowed_arguments_;
-    std::optional<CLI::Argument *> caputured_arg{};
+    std::optional<CLI::Argument*> caputured_arg{};
 
-    std::optional<CLI::Argument *> get_arg(const std::string_view arg_str) {
-        for (auto&arg: allowed_arguments_) {
-            for (const auto&alias: arg.alisases) {
+    std::optional<CLI::Argument*> get_arg(const std::string_view arg_str) {
+        for (auto& arg : allowed_arguments_) {
+            for (const auto& alias : arg.alisases) {
                 if (alias == arg_str) {
                     return {&arg};
                 }
@@ -94,18 +94,18 @@ private:
 public:
     std::vector<std::shared_ptr<Method>> methods;
     std::vector<std::shared_ptr<Function>> functions;
-    Area area{{{-5, 5}}, {{-5, 5}}};
+    Area area{{{-5, -5}}, {{5, 5}}};
 
-    explicit CLI(const std::vector<Argument>&args) : allowed_arguments_(args) {
-    }
+    explicit CLI(const std::vector<Argument>& args) : allowed_arguments_(args) {}
 
+    [[nodiscard]]
     std::vector<CLI::Argument> allowed_arguments() const {
         return allowed_arguments_;
     }
 
-    void parse(const std::vector<std::string>&args) {
+    void parse(const std::vector<std::string>& args) {
         size_t i = 0;
-        for (const auto&arg_str: args) {
+        for (const auto& arg_str : args) {
             // ignore the program's name
             if (i++ == 0) { continue; }
 
@@ -138,8 +138,8 @@ public:
 
     int operator()() {
         try {
-            for (auto func: functions) {
-                for (auto method: methods) {
+            for (auto func : functions) {
+                for (auto method : methods) {
                     auto [min, min_val] = method->minimal(func.get(), area);
 
                     auto [closest, closest_val] = func->closest_minimal(min);
@@ -150,13 +150,12 @@ public:
                                func->name(), area.to_string(), method->name(),
                                min, min_val, method->steps_took(),
                                closest, closest_val,
-                               min.dist_with(closest, [func](const auto&p) { return (*func)(p); })
+                               min.dist_with(closest, [func](const auto& p) { return (*func)(p); })
                     );
                 }
                 fmt::print("\n");
             }
-        }
-        catch (std::invalid_argument&e) {
+        } catch (std::invalid_argument& e) {
             fmt::print(stderr, "got an error, exiting...\n\n{}", e.what());
             return 1;
         }
@@ -168,7 +167,7 @@ public:
 /// this is a joke. not a funny one, but I've cracked a smile. warning: this is a reserved identifier.
 /// std::ostringstream would be more optimal, but this is not a bottleneck for sure.
 /// std::views::join source code is lovely, just look at it for a moment. tabulation with negative 2 spaces is the cherry on top.
-std::string __________________________join(const std::vector<std::string>&vec, const std::string_view sep) {
+std::string __________________________join(const std::vector<std::string>& vec, const std::string_view sep) {
     std::string ret;
     for (size_t i = 0; i < vec.size(); i++) {
         if (i != 0) {
@@ -180,7 +179,7 @@ std::string __________________________join(const std::vector<std::string>&vec, c
 }
 
 /// clearly copypasted
-std::vector<std::string> customSplit(const std::string&str, const char sep) {
+std::vector<std::string> customSplit(const std::string& str, const char sep) {
     std::vector<std::string> ret;
     int startIndex = 0, endIndex = 0;
     for (int i = 0; i <= str.size(); i++) {
@@ -195,7 +194,7 @@ std::vector<std::string> customSplit(const std::string&str, const char sep) {
     return ret;
 }
 
-template<typename T, typename Func>
+template <typename T, typename Func>
 std::vector<T> _____map(std::vector<T> what, Func func) {
     for (size_t i = 0; i < what.size(); i++) {
         what[i] = func(what[i]);
@@ -203,7 +202,7 @@ std::vector<T> _____map(std::vector<T> what, Func func) {
     return what; // RAII, i hope
 }
 
-std::string ________left_pad_single(const std::string&what, const size_t size,
+std::string ________left_pad_single(const std::string& what, const size_t size,
                                     const char filler = ' ', const char sep = '\n') {
     if (what.size() > size) {
         return what + filler;
@@ -211,7 +210,7 @@ std::string ________left_pad_single(const std::string&what, const size_t size,
     return what + std::string(size - what.size(), filler);
 }
 
-std::string ________left_pad(const std::string&what, const size_t size) {
+std::string ________left_pad(const std::string& what, const size_t size) {
     return __________________________join(
         _____map(
             customSplit(what, '\n'),
@@ -224,7 +223,7 @@ int cli_app(int argc, char* argv[]) {
         {
             // Nelder-Mead method
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     auto muted = Log(Log::LEVEL::MUTED);
                     cli.methods.emplace_back(std::make_shared<NelderMead>(muted));
                 },
@@ -233,7 +232,7 @@ int cli_app(int argc, char* argv[]) {
             },
             // RandomWalk method
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     auto muted = Log(Log::LEVEL::MUTED);
                     cli.methods.emplace_back(std::make_shared<RandomWalk>(muted));
                 },
@@ -243,7 +242,7 @@ int cli_app(int argc, char* argv[]) {
 
             // Himmelblau function
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     auto muted = Log(Log::LEVEL::MUTED);
                     cli.functions.emplace_back(std::make_shared<HimmelblauFunction>());
                 },
@@ -258,7 +257,7 @@ int cli_app(int argc, char* argv[]) {
             },
             // Rastrigin function
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     auto size = 2;
                     if (args.size() > 1) {
                         auto [size_, valid] = CLI::parse_int<std::size_t>(args[1], CLI::positive);
@@ -280,20 +279,9 @@ int cli_app(int argc, char* argv[]) {
                 )
             },
 
-            // Rastrigin function
-            CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
-                    for (const auto&method: cli.methods) {
-                        method->log(Log(Log::LEVEL::INFO));
-                    }
-                },
-                {"-t", "--trace"}, 1,
-                "print tracing info (like steps in methods)",
-            },
-
             // Area
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     size_t dimensions = cli.area.dimensions();
                     double min = -5;
                     double max = 5;
@@ -304,15 +292,13 @@ int cli_app(int argc, char* argv[]) {
                             throw std::invalid_argument(fmt::format("{} has to be > 1 (got {})", args[0], args[1]));
                         }
                         dimensions = size_;
-                    }
-                    else if (args.size() > 2) {
+                    } else if (args.size() > 2) {
                         auto [min_, valid] = CLI::parse_double(args[1]);
                         if (!valid) {
                             throw std::invalid_argument(fmt::format("{} has to be > 1 (got {})", args[0], args[1]));
                         }
                         min = min_;
-                    }
-                    else if (args.size() > 3) {
+                    } else if (args.size() > 3) {
                         auto [max_, valid] = CLI::parse_double(args[1]);
                         if (!valid) {
                             throw std::invalid_argument(fmt::format("{} has to be > 1 (got {})", args[0], args[1]));
@@ -327,7 +313,7 @@ int cli_app(int argc, char* argv[]) {
 
             // Area custom
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     std::string filename = args[1];
                     std::ifstream fin(filename);
                     size_t dimensions;
@@ -345,7 +331,7 @@ int cli_app(int argc, char* argv[]) {
 
             // Seed
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     auto [seed, valid] = CLI::parse_int<std::size_t>(args[1]);
                     random::engine() = std::mt19937_64(seed);
                 },
@@ -355,17 +341,17 @@ int cli_app(int argc, char* argv[]) {
 
             // Help
             CLI::Argument{
-                [](CLI&cli, std::vector<std::string> args) {
+                [](CLI& cli, std::vector<std::string> args) {
                     std::string message;
 
                     std::vector<std::string> arguments_help;
                     size_t max_aliases_len = 0;
-                    for (const auto&arg: cli.allowed_arguments()) {
+                    for (const auto& arg : cli.allowed_arguments()) {
                         max_aliases_len = std::max(__________________________join(arg.alisases, ", ").size(),
                                                    max_aliases_len);
                     }
 
-                    for (const auto&arg: cli.allowed_arguments()) {
+                    for (const auto& arg : cli.allowed_arguments()) {
                         arguments_help.push_back(fmt::format("  {}  ---  {}",
                                                              ________left_pad(
                                                                  __________________________join(arg.alisases, ", "),
@@ -382,7 +368,18 @@ int cli_app(int argc, char* argv[]) {
                 },
                 {"-h", "--help"}, 1,
                 "print this message and exit"
-            }
+            },
+
+            // Trace
+            CLI::Argument{
+                [](CLI& cli, std::vector<std::string> args) {
+                    for (const auto& method : cli.methods) {
+                        method->log(Log(Log::LEVEL::DEBUG));
+                    }
+                },
+                {"-t", "--trace"}, 1,
+                "print tracing info (like steps in methods)",
+            },
         }
     };
 

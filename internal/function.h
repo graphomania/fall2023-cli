@@ -9,8 +9,8 @@
 #include <limits>
 
 
-template<typename Ret, typename T, typename F=std::function<Ret(T)>>
-std::vector<Ret> map(const std::vector<T>&from, const F&func) {
+template <typename Ret, typename T, typename F=std::function<Ret(T)>>
+std::vector<Ret> map(const std::vector<T>& from, const F& func) {
     auto ret = std::vector<Ret>(from.size());
     for (size_t i = 0; i < from.size(); i++) {
         ret[i] = func(from[i]);
@@ -24,7 +24,7 @@ public:
 
     virtual ~FunctionI() = default;
 
-    virtual double operator()(const Point&point) const = 0;
+    virtual double operator()(const Point& point) const = 0;
 
     [[nodiscard]] virtual std::vector<FunctionI::Value> minimal() const = 0;
 
@@ -34,11 +34,11 @@ public:
 
     [[nodiscard]] virtual std::string name() const = 0;
 
-    [[nodiscard]] FunctionI::Value closest_minimal(const Point&point) const {
+    [[nodiscard]] FunctionI::Value closest_minimal(const Point& point) const {
         const auto point_extended = point.appended(this->operator()(point));
         auto min_dist = std::numeric_limits<double>::max();
         Point ret;
-        for (auto [min_point, min_value]: minimal()) {
+        for (auto [min_point, min_value] : minimal()) {
             if (const auto dist = min_point.appended(min_value).dist(point_extended); min_dist > dist) {
                 min_dist = dist;
                 ret = min_point;
@@ -47,9 +47,8 @@ public:
         return {ret, operator()(ret)};
     }
 
-    [[nodiscard]] double MSE(const std::vector<Point>&lhs, const std::vector<Point>&rhs) const {
+    [[nodiscard]] double MSE(const std::vector<Point>& lhs, const std::vector<Point>& rhs) const {
         assert(lhs.size() == rhs.size());
-
 
         double ret = 0;
         for (size_t i = 0; i < lhs.size(); i++) {
@@ -69,17 +68,16 @@ protected:
 
 public:
     Function(const size_t n, std::vector<Point> min, std::vector<Point> max)
-        : dimensions_(n), known_min_(std::move(min)), known_max_(std::move(max)) {
-    }
+        : dimensions_(n), known_min_(std::move(min)), known_max_(std::move(max)) {}
 
     [[nodiscard]] std::vector<FunctionI::Value> minimal() const override {
-        return map<Function::Value>(known_min_, [func=this](const Point&x)-> Function::Value {
+        return map<Function::Value>(known_min_, [func=this](const Point& x)-> Function::Value {
             return {x, func->operator()(x)};
         });
     }
 
     [[nodiscard]] std::vector<FunctionI::Value> maximum() const override {
-        return map<Function::Value>(known_max_, [func=this](const Point&x)-> Function::Value {
+        return map<Function::Value>(known_max_, [func=this](const Point& x)-> Function::Value {
             return {x, func->operator()(x)};
         });
     }
@@ -108,17 +106,17 @@ public:
         known_max_ = {{}};
         for (size_t i = 0; i < n; i++) {
             auto next_known_max = std::vector<Point>{};
-            for (const auto&point: known_max_) {
+            for (const auto& point : known_max_) {
                 next_known_max.push_back(point.appended(4.5229936666666));
             }
             known_max_ = std::move(next_known_max);
         }
     }
 
-    double operator()(const Point&point) const override {
+    double operator()(const Point& point) const override {
         constexpr double A = 10;
         double ret = A * point.size();
-        for (auto x: point) {
+        for (auto x : point) {
             ret += sqr(x) - A * std::cos(2 * std::numbers::pi * x);
         }
         return ret;
@@ -126,7 +124,7 @@ public:
 
     [[nodiscard]] std::string name() const override {
         return std::string{"Rastrigin function [f(x) = 10n + \\sum_{i=1}^{"} +
-               fmt::format("{}", size_) + "} (x_i^2 - 10 * cos(2 \\pi x_i))]";
+            fmt::format("{}", size_) + "} (x_i^2 - 10 * cos(2 \\pi x_i))]";
     }
 };
 
@@ -150,7 +148,7 @@ public:
         }
     }
 
-    double operator()(const Point&point) const override {
+    double operator()(const Point& point) const override {
         if (point.size() != 2) {
             throw std::invalid_argument(
                 fmt::format("HimmelblauFunction::call: point.dimension={} is invalid, should be exactly 2",

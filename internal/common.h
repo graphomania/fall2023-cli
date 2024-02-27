@@ -15,7 +15,7 @@
 #include <sstream>
 
 
-auto sqr(const auto&x) {
+auto sqr(const auto& x) {
     return x * x;
 }
 
@@ -28,14 +28,14 @@ auto abs(auto val) {
 
 
 class Point : public std::vector<double> {
-    void assert_sizes_match(const Point&other, std::string_view from) const {
+    void assert_sizes_match(const Point& other, std::string_view from) const {
         if (this->size() != other.size())
             throw std::invalid_argument(fmt::format("Point::{}: sizes doesn't match, {} != {}\n({}, {})", from,
                                                     size(), other.size(), *this, other));
     }
 
 public:
-    static Point random(const size_t dimension, const Point&min, const Point&max) {
+    static Point random(const size_t dimension, const Point& min, const Point& max) {
         auto ret = Point{};
         ret.resize(dimension);
         for (size_t i = 0; i < dimension; i++) {
@@ -52,7 +52,7 @@ public:
         return ret;
     }
 
-    [[nodiscard]] double dist(const Point&to) const {
+    [[nodiscard]] double dist(const Point& to) const {
         assert_sizes_match(to, "to");
 
         double ret = 0;
@@ -61,11 +61,11 @@ public:
         return ret;
     }
 
-    [[nodiscard]] double dist_with(const Point&to, const std::function<double(const Point&x)>&func) const {
+    [[nodiscard]] double dist_with(const Point& to, const std::function<double(const Point& x)>& func) const {
         return this->appended(func(*this)).dist(to.appended(func(to)));
     }
 
-    Point operator+(const Point&other) const {
+    Point operator+(const Point& other) const {
         assert_sizes_match(other, "operator+");
 
         auto ret = Point{};
@@ -76,7 +76,7 @@ public:
         return ret;
     }
 
-    Point operator-(const Point&other) const {
+    Point operator-(const Point& other) const {
         assert_sizes_match(other, "operator-");
         return *this + -other;
     }
@@ -94,10 +94,20 @@ public:
 
     Point operator-() const { return *this * (-1); }
 
-    [[nodiscard]] Point appended(const double x) const {
+    [[nodiscard]]
+    Point appended(const double x) const {
         auto copy = *this;
         copy.push_back(x);
         return copy;
+    }
+
+    [[nodiscard]]
+    Point uniformly_deviate(const double min, const double max) const {
+        auto ret = Point{};
+        for (const auto coord : *this) {
+            ret.push_back(coord + random::gen(min, max));
+        }
+        return ret;
     }
 };
 
@@ -118,7 +128,7 @@ public:
         }
     }
 
-    [[nodiscard]] bool contains(const Point&point) const {
+    [[nodiscard]] bool contains(const Point& point) const {
         if (point.size() != dimensions()) {
             throw std::invalid_argument("the point is from other dimestion");
         }
@@ -140,7 +150,7 @@ public:
         auto points = std::vector<Point>{{}};
         for (size_t i = 0; i < dimensions(); i++) {
             auto next = std::vector<Point>{};
-            for (auto&point: points) {
+            for (auto& point : points) {
                 next.push_back(point.appended(min_[i]));
                 next.push_back(point.appended(max_[i]));
             }

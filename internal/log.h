@@ -27,7 +27,7 @@ public:
         INFO,
         WARN,
         ERROR,
-        MUTED
+        MUTED,
     };
 
 private:
@@ -35,6 +35,7 @@ private:
     std::FILE* to_;
     mutable size_t counter_{};
     mutable bool is_counted_{};
+    mutable std::string prefix_;
 
 public:
     static Log null() {
@@ -42,8 +43,7 @@ public:
     }
 
     explicit Log(const LEVEL lvl, std::FILE* to = stderr)
-        : level_(lvl), to_(to) {
-    }
+        : level_(lvl), to_(to) {}
 
     const Log& counted() const {
         is_counted_ = true;
@@ -52,11 +52,16 @@ public:
 
     void log(std::string_view level, std::string_view message) const {
         if (is_counted_) {
-            fmt::print(to_, "{} {}: {}. {}\n", time_string(), level, ++counter_, message);
+            fmt::print(to_, "{} {}:{} {}. {}\n", time_string(), level, prefix_, ++counter_, message);
+        } else {
+            fmt::print(to_, "{} {}:{} {}\n", time_string(), level, prefix_, message);
         }
-        else {
-            fmt::print(to_, "{} {}: {}\n", time_string(), level, message);
-        }
+    }
+
+    Log with(std::string prefix) const {
+        auto cp = *this;
+        cp.prefix_ = std::move(prefix);
+        return cp;
     }
 
     void debug(const std::string_view messsage) const {

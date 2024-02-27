@@ -13,16 +13,15 @@ protected:
 public:
     virtual ~Method() = default;
 
-    explicit Method(const Log&logger) : log_(logger) {
-    }
+    explicit Method(const Log& logger) : log_(logger) {}
 
     [[nodiscard]] virtual std::string name() const = 0;
 
     [[nodiscard]] virtual std::size_t steps_took() const { return steps_; };
 
-    virtual Function::Value minimal(Function* func, const Area&where) const = 0;
+    virtual Function::Value minimal(Function* func, const Area& where) const = 0;
 
-    virtual Method* log(const Log&new_log) {
+    virtual Method* log(const Log& new_log) {
         log_ = new_log;
         return this;
     }

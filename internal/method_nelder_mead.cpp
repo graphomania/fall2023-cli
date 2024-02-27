@@ -6,7 +6,7 @@
 using namespace std;
 
 
-Point centroid(const std::vector<Point>&polygon) {
+Point centroid(const std::vector<Point>& polygon) {
     auto ret = polygon[0];
     for (size_t i = 1; i < polygon.size(); i++) {
         ret = ret + polygon[i];
@@ -14,12 +14,12 @@ Point centroid(const std::vector<Point>&polygon) {
     return ret / polygon.size();
 }
 
-template<typename T>
-std::vector<T> sub_vector(const std::vector<T>&vec, size_t begin, size_t end) {
+template <typename T>
+std::vector<T> sub_vector(const std::vector<T>& vec, size_t begin, size_t end) {
     return {vec.begin() + begin, vec.end() - (vec.size() - end)};
 }
 
-Function::Value NelderMead::minimal_internal(Function* func, vector<Point>&x) const {
+Function::Value NelderMead::minimal_internal(Function* func, vector<Point>& x) const {
     auto return_or_go_deeper = [&, prev_x = x]() -> Function::Value {
         log_.debug(fmt::format("({}, {}) {} {}", x.size(), prev_x.size(), x, prev_x));
         const auto mse = func->MSE(x, prev_x);
@@ -31,7 +31,7 @@ Function::Value NelderMead::minimal_internal(Function* func, vector<Point>&x) co
     };
 
     // 1. Order
-    ranges::sort(x, [&](const auto&lhs, const auto&rhs) -> bool {
+    ranges::sort(x, [&](const auto& lhs, const auto& rhs) -> bool {
         return (*func)(lhs) < (*func)(rhs);
     });
 
@@ -68,8 +68,7 @@ Function::Value NelderMead::minimal_internal(Function* func, vector<Point>&x) co
                 log_.debug("Nelder contraction (*func)(x_r) < (*func)(x.back()) & (*func)(x_c) < (*func)(x_r)");
                 return return_or_go_deeper();
             }
-        }
-        else {
+        } else {
             if (const auto x_c = x_o + (x.back() - x_o) * rho_; (*func)(x_c) < (*func)(x_r)) {
                 x.back() = x_c;
                 log_.debug("Nelder contraction (*func)(x_r) >= (*func)(x.back()) & (*func)(x_c) < (*func)(x_r)");
@@ -86,12 +85,14 @@ Function::Value NelderMead::minimal_internal(Function* func, vector<Point>&x) co
     return return_or_go_deeper();
 }
 
-Function::Value NelderMead::minimal_internal_(Function* function, std::vector<Point>&x) const {
-    auto func = [function](const auto&p) { return (*function)(p); };
+Function::Value NelderMead::minimal_internal_(Function* function, std::vector<Point>& x) const {
+    auto func = [function](const auto& p) { return (*function)(p); };
     auto return_or_go_deeper = [&, prev_x = x]() -> Function::Value {
         steps_ += 1;
         auto mse = function->MSE(x, prev_x);
         if (mse < tolerance_) {
+            log_.counted().info(fmt::format("{} < {} (MSE < tolerance) at {}, therefore exiting",
+                                            mse, tolerance_, x[0]));
             return {x[0], func(x[0])};
         }
         log_.counted().info(fmt::format("{}\t -> {} (MSE: {})", x, prev_x, mse));
@@ -99,7 +100,7 @@ Function::Value NelderMead::minimal_internal_(Function* function, std::vector<Po
     };
 
     // 1. Order
-    sort(x.begin(), x.end(), [&](const auto&lhs, const auto&rhs) -> bool {
+    sort(x.begin(), x.end(), [&](const auto& lhs, const auto& rhs) -> bool {
         return func(lhs) < func(rhs);
     });
 
@@ -119,8 +120,7 @@ Function::Value NelderMead::minimal_internal_(Function* function, std::vector<Po
         if (func(x_e) < func(x_r)) {
             x.back() = x_e;
             return return_or_go_deeper();;
-        }
-        else {
+        } else {
             x.back() = x_r;
             return return_or_go_deeper();
         }
@@ -133,8 +133,7 @@ Function::Value NelderMead::minimal_internal_(Function* function, std::vector<Po
                 x.back() = x_c;
                 return return_or_go_deeper();
             }
-        }
-        else {
+        } else {
             if (auto x_c = x_o + (x.back() - x_o) * rho_; func(x_c) < func(x_r)) {
                 x.back() = x_c;
                 return return_or_go_deeper();
