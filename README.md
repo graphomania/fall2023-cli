@@ -30,6 +30,8 @@ bash ./scripts/generate_docs.sh
 
 ## Usage
 
+> To run this app with GUI just use ./fall2023 without any args.
+
 In terminal:
 
 ```
