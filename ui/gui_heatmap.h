@@ -54,7 +54,7 @@ public:
             const auto right = experiment_.area->point_to_percentile(experiment_.path[i]);
             painter.drawLine(QPoint{
                                  static_cast<int>(left.first * width),
-                                 height - static_cast<int>(left.second * height)
+                                 height - 1 - static_cast<int>(left.second * height)
                              },
                              QPoint{
                                  static_cast<int>(right.first * width),
