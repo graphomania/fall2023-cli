@@ -9,3 +9,7 @@ std::mt19937_64& random::engine() {
     static std::mt19937_64 engine_(0);
     return engine_;
 }
+
+bool random::with_chance(const double chance) {
+    return gen(0, 1) < chance;
+}

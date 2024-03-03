@@ -155,11 +155,50 @@ public:
                             point.size())
             );
         }
-        return sqr(sqr(point[0]) + point[1] - 11) + sqr(point[0] + sqr(point[1]) - 7);;
+        return sqr(sqr(point[0]) + point[1] - 11) + sqr(point[0] + sqr(point[1]) - 7);
     }
 
     [[nodiscard]] std::string name() const override {
         return "Himmelblau function [f(x, y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2]";
+    }
+};
+
+
+// Styblinski–Tang function: https://en.wikipedia.org/wiki/File:Goldstein_Price_function.pdf
+class StyblinskiTangFunction final : public Function {
+public:
+    explicit StyblinskiTangFunction(size_t n = 2)
+        : Function(n,
+                   {
+                       {{-2.903534, -2.903534}}
+                   },
+                   {}
+        ) {
+        if (n != 2) {
+            throw std::invalid_argument(
+                fmt::format("Styblinski–Tang: dimension={} is invalid, should be exactly 2", n)
+            );
+        }
+    }
+
+    double operator()(const Point& point) const override {
+        if (point.size() != 2) {
+            throw std::invalid_argument(
+                fmt::format("Styblinski–Tang::call: point.dimension={} is invalid, should be exactly 2",
+                            point.size())
+            );
+        }
+        constexpr auto pi2 = std::numbers::pi * 2;
+        constexpr auto e = std::numbers::e;
+
+        const auto x = point[0];
+        const auto y = point[1];
+        return ((sqr(sqr(x)) - 16 * sqr(x) + 5 * x) + (sqr(sqr(y)) - 16 * sqr(y) + 5 * y)) / 2 + 80;
+    }
+
+    [[nodiscard]] std::string name() const override {
+        return
+            R"(Styblinski–Tang function [f(x, y) = \sum_{i=0}^n{x_i^4 - 16x_i^2 + 5x_i} / 2])";
     }
 };
 

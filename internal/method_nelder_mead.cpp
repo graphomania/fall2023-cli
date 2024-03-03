@@ -85,18 +85,20 @@ Function::Value NelderMead::minimal_internal(Function* func, vector<Point>& x) c
     return return_or_go_deeper();
 }
 
-Function::Value NelderMead::minimal_internal_(Function* function, std::vector<Point>& x) const {
+Function::Value
+NelderMead::minimal_internal_(Function* function, std::vector<Point>& x, std::vector<Point>& path) const {
     auto func = [function](const auto& p) { return (*function)(p); };
     auto return_or_go_deeper = [&, prev_x = x]() -> Function::Value {
         steps_ += 1;
         auto mse = function->MSE(x, prev_x);
+        path.push_back(x[0]);
         if (mse < tolerance_) {
             log_.counted().info(fmt::format("{} < {} (MSE < tolerance) at {}, therefore exiting",
                                             mse, tolerance_, x[0]));
             return {x[0], func(x[0])};
         }
-        log_.counted().info(fmt::format("{}\t -> {} (MSE: {})", x, prev_x, mse));
-        return minimal_internal_(function, x);
+        log_.counted().info(fmt::format("{}\t -> {} (MSE: {})", prev_x, x, mse));
+        return minimal_internal_(function, x, path);
     };
 
     // 1. Order

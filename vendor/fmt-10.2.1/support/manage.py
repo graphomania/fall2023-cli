@@ -13,7 +13,6 @@ obtained from https://github.com/settings/tokens.
 from __future__ import print_function
 
 import datetime
-import docopt
 import errno
 import fileinput
 import json
@@ -25,6 +24,8 @@ import sys
 from contextlib import contextmanager
 from distutils.version import LooseVersion
 from subprocess import check_call
+
+import docopt
 
 
 class Git:

@@ -173,6 +173,24 @@ public:
         }
         return oss.str();
     }
+
+    [[nodiscard]] double percentile(const size_t dimension, const double x) const {
+        return min_[dimension] + (max_[dimension] - min_[dimension]) * x;
+    }
+
+    [[nodiscard]] std::pair<double, double> point_to_percentile(const Point& point) const {
+        if (point.size() != 2) {
+            throw std::invalid_argument("point_to_percentile: point.size() != 2");
+        }
+        if (!this->contains(point)) {
+            fmt::print(stderr, "WARN: point {} is not exactly in the area\n", point);
+            return {};
+        }
+        return {
+            (point[0] - min_[0]) / (max_[0] - min_[0]),
+            (point[1] - min_[1]) / (max_[1] - min_[1]),
+        };
+    }
 };
 
 

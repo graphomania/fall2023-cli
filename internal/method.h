@@ -21,6 +21,9 @@ public:
 
     virtual Function::Value minimal(Function* func, const Area& where) const = 0;
 
+    virtual std::pair<std::vector<Point>, Function::Value>
+    minimal_with_path(Function* func, const Area& where) const = 0;
+
     virtual Method* log(const Log& new_log) {
         log_ = new_log;
         return this;

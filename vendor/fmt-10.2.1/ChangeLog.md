@@ -3162,7 +3162,7 @@
   [dtoa-benchmark](https://github.com/fmtlib/dtoa-benchmark):
 
   | Function      | Time (ns) | Speedup |
-      | ------------- | --------: | ------: |
+        | ------------- | --------: | ------: |
   | ostringstream | 1,346.30  | 1.00x   |
   | ostrstream    | 1,195.74  | 1.13x   |
   | sprintf       | 995.08    | 1.35x   |
@@ -3972,7 +3972,7 @@
   (macOS, clang-902.0.39.2):
 
   | Method                     | Time, s         | Speedup |
-      | -------------------------- | --------------: | ------: |
+        | -------------------------- | --------------: | ------: |
   | fmt::format 5.1            | 0.58            |         |
   | fmt::format 5.2            | 0.35            |   1.66x |
   | fmt::format_to 5.1         | 0.51            |         |
@@ -5371,7 +5371,7 @@
   theme](http://ryan-roemer.github.io/sphinx-bootstrap-theme/):
 
   | Old | New |
-      | --- | --- |
+        | --- | --- |
   | ![](https://cloud.githubusercontent.com/assets/576385/4792130/cd256436-5de3-11e4-9a62-c077d0c2b003.png) | ![](https://cloud.githubusercontent.com/assets/576385/4792131/cd29896c-5de3-11e4-8f59-cac952942bf0.png) |
 
 # 0.11.0 - 2014-08-21
