@@ -116,7 +116,7 @@ class Area {
 
 public:
     static Area cube(const size_t dimensions, const double min, const double max) {
-        return Area(Point(std::vector(dimensions, min)), Point(std::vector(dimensions, max)));
+        return Area(Point::rep(dimensions, min), Point::rep(dimensions, max));
     }
 
     Area(Point min, Point max) : min_(std::move(min)), max_(std::move(max)) {

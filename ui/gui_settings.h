@@ -67,8 +67,8 @@ public:
                 must_double(randomWalkDelta->text().toStdString(), positive<double>),
                 must_double(randomWalkP->text().toStdString(), [](auto val) { return val >= 0 and val <= 1; }),
                 must_double(randomWalkStopEps->text().toStdString(), positive<double>),
-                must_int64(randomWalkMinSteps->text().toStdString(), non_negative<size_t>),
-                must_int64(randomWalkSteps->text().toStdString(), positive<size_t>)
+                must_int64(randomWalkMinSteps->text().toStdString(), false),
+                must_int64(randomWalkSteps->text().toStdString(), false)
             );
             break;
 

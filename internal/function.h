@@ -188,9 +188,6 @@ public:
                             point.size())
             );
         }
-        constexpr auto pi2 = std::numbers::pi * 2;
-        constexpr auto e = std::numbers::e;
-
         const auto x = point[0];
         const auto y = point[1];
         return ((sqr(sqr(x)) - 16 * sqr(x) + 5 * x) + (sqr(sqr(y)) - 16 * sqr(y) + 5 * y)) / 2 + 80;
