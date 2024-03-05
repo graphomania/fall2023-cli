@@ -3,10 +3,18 @@
 
 
 int main(int argc, char* argv[]) {
-    if (argc == 1) {
-        QApplication app(argc, argv);
-        return MainWindow(&app).start();
-    }
+    try {
+        if (argc == 1) {
+            QApplication app(argc, argv);
+            return MainWindow(&app).start();
+        }
 
-    return cli_app(argc, argv);
+        return cli_app(argc, argv);
+    } catch (std::exception& e) {
+        fmt::println(stderr, "RUNTIME ERROR: {}", e.what());
+        return 1;
+    } catch (...) {
+        fmt::println(stderr, "WE ARE ON FIRE (probly), sorry about that");
+        return -1;
+    }
 }
