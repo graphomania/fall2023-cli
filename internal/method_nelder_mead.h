@@ -9,7 +9,7 @@
 
 
 class NelderMead final : public Method {
-    std::optional<std::vector<Point>> start_;
+    std::optional<std::vector<Point>> starts_;
     double tolerance_;
     double alpha_;
     double gamma_;
@@ -34,7 +34,7 @@ public:
                         const double rho = 0.5,
                         const double sigma = 0.5)
         : Method(logger.with("NelderMead")),
-          start_(std::move(start)),
+          starts_(std::move(start)),
           tolerance_(threashold),
           alpha_(alpha),
           gamma_(gamma),
@@ -42,7 +42,7 @@ public:
           sigma_(sigma) {}
 
     NelderMead& with(std::vector<Point> start) {
-        start_ = std::move(start);
+        starts_ = std::move(start);
         return *this;
     }
 
@@ -55,12 +55,15 @@ public:
     std::pair<std::vector<Point>, Function::Value>
     minimal_with_path(Function* func, const Area& where) const override {
         auto x = std::vector<Point>{};
-        if (start_.has_value()) {
-            x = start_.value();
+        if (starts_.has_value()) {
+            x = starts_.value();
         } else {
             for (size_t i = 0; i <= where.dimensions(); i++) {
                 x.push_back(where.random_point());
             }
+        }
+        if (start_.has_value()) {
+            x[0] = start_.value();
         }
 
         steps_ = 0;

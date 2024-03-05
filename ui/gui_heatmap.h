@@ -74,17 +74,43 @@ public:
         return this;
     }
 
+    HeatmapWidget* with(const std::function<void(bool)>& callback) {
+        callback_ = callback;
+        return this;
+    }
+
     HeatmapWidget* draw(const bool flag) {
         draw_ = flag;
         return this;
     }
 
+    void mousePressEvent(QMouseEvent* event) override {
+        if (event->button() == Qt::LeftButton && experiment_.area->dimensions() == 2) {
+            const int width = this->width();
+            const int height = this->height();
+            double realX = experiment_.area->percentile(0, static_cast<double>(event->pos().x()) / width);
+            double realY = experiment_.area->percentile(1, static_cast<double>(height - event->pos().y()) / height);
+
+            // experiment_.method->with_start({{realX, realY}});
+            start_ = {{{realX, realY}}};
+            fmt::println("{} {} in {}", realX, realY, experiment_.area->to_string());
+            callback_(true);
+        }
+    }
+
+    [[nodiscard]]
+    std::optional<Point> start() const {
+        return start_;
+    };
+
 private:
     Experiment experiment_;
+    std::function<void(bool)> callback_;
+    std::optional<Point> start_;
     size_t rate_ = 3, pixel_size_ = 8;
     bool draw_ = true;
 
-    QColor temperatureToColor(double temperature) {
+    static QColor temperatureToColor(double temperature) {
         int r = static_cast<int>(255 * pow(temperature, 3));
         int b = static_cast<int>(255 * pow(1 - temperature, 3));
         if (r > 255 || b > 255) {
@@ -93,7 +119,7 @@ private:
         return {r, 0, b};
     }
 
-    double map(double value, double start1, double end1, double start2, double end2) {
+    static double map(double value, double start1, double end1, double start2, double end2) {
         return (start2 + (end2 - start2) * ((value - start1) / (end1 - start1)));
     }
 };

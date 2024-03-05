@@ -227,12 +227,12 @@ private:
 
         pageRandomWalkLayout->addWidget(new QLabel("P"));
         randomWalkP = new QLineEdit(this);
-        randomWalkP->setText("0.1");
+        randomWalkP->setText("0.2");
         pageRandomWalkLayout->addWidget(randomWalkP);
 
         pageRandomWalkLayout->addWidget(new QLabel("Delta"));
         randomWalkDelta = new QLineEdit(this);
-        randomWalkDelta->setText("0.5");
+        randomWalkDelta->setText("0.1s");
         pageRandomWalkLayout->addWidget(randomWalkDelta);
 
 

@@ -1,6 +1,8 @@
 #ifndef METHOD_H
 #define METHOD_H
 
+#include <optional>
+
 #include "log.h"
 #include "function.h"
 
@@ -9,6 +11,7 @@ class Method {
 protected:
     Log log_;
     mutable std::size_t steps_ = 0;
+    std::optional<Point> start_;
 
 public:
     virtual ~Method() = default;
@@ -23,6 +26,12 @@ public:
 
     virtual std::pair<std::vector<Point>, Function::Value>
     minimal_with_path(Function* func, const Area& where) const = 0;
+
+    Method* with_start(Point point) {
+        fmt::println(stderr, "with start {}", point);
+        this->start_ = {std::move(point)};
+        return this;
+    }
 
     virtual Method* log(const Log& new_log) {
         log_ = new_log;

@@ -13,6 +13,8 @@
 #include <functional>
 #include <fstream>
 
+#include "parse.h"
+
 
 std::vector<std::string> stringify(const int argc, char* argv[]) {
     auto ret = std::vector<std::string>(argc);
@@ -379,6 +381,39 @@ int cli_app(int argc, char* argv[]) {
                 },
                 {"-t", "--trace"}, 1,
                 "print tracing info (like steps in methods)",
+            },
+
+            // Starting point in R^2
+            CLI::Argument{
+                [](CLI& cli, std::vector<std::string> args) {
+                    for (auto& method : cli.methods) {
+                        method->with_start(Point{
+                            {
+                                parse_double(args[1]).first,
+                                parse_double(args[2]).first
+                            }
+                        });
+                    }
+                },
+                {"-sp2", "--starting-point-2"}, 3,
+                "starting point (works in R^2 only), usage: -sp <X> <Y>",
+            },
+
+            // Starting point in R^3
+            CLI::Argument{
+                [](CLI& cli, std::vector<std::string> args) {
+                    for (auto& method : cli.methods) {
+                        method->with_start(Point{
+                            {
+                                must_double(args[1]),
+                                must_double(args[2]),
+                                must_double(args[3])
+                            }
+                        });
+                    }
+                },
+                {"-sp3", "--starting-point-3"}, 4,
+                "starting point (works in R^3 only), usage: -sp <X> <Y> <Z>",
             },
         }
     };

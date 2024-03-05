@@ -30,10 +30,10 @@ public:
         setMinimumSize(400, 300);
         setWindowTitle("Function Minima");
         resize(800, 600);
-        graph_update();
+        graph_update(false);
     }
 
-    void graph_update() const {
+    void graph_update(bool save_start) const {
         try {
             heatmap_widget_->setGeometry(0, 30, width(), height() - 100);
             auto experiment = settingsDialog_.getExperiment();
@@ -41,12 +41,20 @@ public:
             random::engine() = std::mt19937_64(seed);
             heatmap_widget_->draw(drawGraph);
 
-
+            if (save_start) {
+                if (const auto start = heatmap_widget_->start(); start.has_value()) {
+                    experiment.method->with_start(start.value());
+                }
+            }
             auto [path, mimima] = experiment.method->minimal_with_path(&*experiment.function, *experiment.area);
             experiment.path = path;
+
             heatmap_widget_->
                 with(experiment)->
-                with(sampleDensity, pixelSize);
+                with(sampleDensity, pixelSize)->
+                with([this](bool flag) {
+                    this->graph_update(flag);
+                });
             heatmap_widget_->update();
 
             info_->setGeometry(20, height() - 80, width() - 20, 80);
@@ -65,7 +73,7 @@ public:
     }
 
     void resizeEvent(QResizeEvent* event) override {
-        graph_update();
+        graph_update(true);
     }
 
     int start() {
@@ -73,7 +81,7 @@ public:
         settingsButton.setGeometry(0, 0, 80, 30);
         QObject::connect(&settingsButton, &QPushButton::clicked, [this]() {
             if (settingsDialog_.exec() == QDialog::Accepted) {
-                graph_update();
+                graph_update(false);
             }
         });
 

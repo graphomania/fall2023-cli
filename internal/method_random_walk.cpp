@@ -8,6 +8,10 @@
 Function::Value RandomWalk::minimal_internal(Function* func, const Area& where, std::vector<Point>& path) const {
     steps_ = 0;
     std::optional<Function::Value> min;
+    if (start_.has_value()) {
+        min = {start_.value(), (*func)(start_.value())};
+        path.push_back(start_.value());
+    }
     for (size_t iter = 1; iter < max_; iter++) {
         steps_ += 1;
         Point point;

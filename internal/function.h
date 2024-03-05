@@ -117,7 +117,7 @@ public:
         constexpr double A = 10;
         double ret = A * point.size();
         for (auto x : point) {
-            ret += sqr(x) - A * std::cos(2 * std::numbers::pi * x);
+            ret += sqr(x) - A * std::cos(2 * 3.14 /*good enough*/ * x);
         }
         return ret;
     }
