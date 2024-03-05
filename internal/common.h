@@ -128,7 +128,8 @@ public:
         }
     }
 
-    [[nodiscard]] bool contains(const Point& point) const {
+    [[nodiscard]]
+    bool contains(const Point& point) const {
         if (point.size() != dimensions()) {
             throw std::invalid_argument("the point is from other dimestion");
         }
@@ -142,11 +143,13 @@ public:
         return true;
     }
 
-    [[nodiscard]] Point random_point() const {
+    [[nodiscard]]
+    Point random_point() const {
         return Point::random(min_.size(), min_, max_);
     }
 
-    [[nodiscard]] std::vector<Point> border_vertexes() const {
+    [[nodiscard]]
+    std::vector<Point> border_vertexes() const {
         auto points = std::vector<Point>{{}};
         for (size_t i = 0; i < dimensions(); i++) {
             auto next = std::vector<Point>{};
@@ -159,11 +162,13 @@ public:
         return points;
     }
 
-    [[nodiscard]] size_t dimensions() const {
+    [[nodiscard]]
+    size_t dimensions() const {
         return min_.size();
     }
 
-    [[nodiscard]] std::string to_string() const {
+    [[nodiscard]]
+    std::string to_string() const {
         std::ostringstream oss;
         for (size_t i = 0; i < dimensions(); i++) {
             if (i != 0) {
@@ -174,11 +179,13 @@ public:
         return oss.str();
     }
 
-    [[nodiscard]] double percentile(const size_t dimension, const double x) const {
+    [[nodiscard]]
+    double percentile(const size_t dimension, const double x) const {
         return min_[dimension] + (max_[dimension] - min_[dimension]) * x;
     }
 
-    [[nodiscard]] std::pair<double, double> point_to_percentile(const Point& point) const {
+    [[nodiscard]]
+    std::pair<double, double> point_to_percentile(const Point& point) const {
         if (point.size() != 2) {
             throw std::invalid_argument("point_to_percentile: point.size() != 2");
         }
@@ -190,6 +197,16 @@ public:
             (point[0] - min_[0]) / (max_[0] - min_[0]),
             (point[1] - min_[1]) / (max_[1] - min_[1]),
         };
+    }
+
+    [[nodiscard]]
+    Area extended(size_t n) const {
+        auto ret = *this;
+        for (size_t i = 0; i < n; i++) {
+            ret.min_.push_back(ret.min_.back());
+            ret.max_.push_back(ret.max_.back());
+        }
+        return ret;
     }
 };
 

@@ -70,23 +70,30 @@ public:
     Function(const size_t n, std::vector<Point> min, std::vector<Point> max)
         : dimensions_(n), known_min_(std::move(min)), known_max_(std::move(max)) {}
 
-    [[nodiscard]] std::vector<FunctionI::Value> minimal() const override {
+    [[nodiscard]]
+    std::vector<FunctionI::Value> minimal() const override {
         return map<Function::Value>(known_min_, [func=this](const Point& x)-> Function::Value {
             return {x, func->operator()(x)};
         });
     }
 
-    [[nodiscard]] std::vector<FunctionI::Value> maximum() const override {
+    [[nodiscard]]
+    std::vector<FunctionI::Value> maximum() const override {
         return map<Function::Value>(known_max_, [func=this](const Point& x)-> Function::Value {
             return {x, func->operator()(x)};
         });
     }
 
-    [[nodiscard]] bool is_dimensions_supported(size_t n) const override {
+    [[nodiscard]]
+    bool is_dimensions_supported(size_t n) const override {
         if (dimensions_ == 0) {
             return true;
         }
         return n == dimensions_;
+    }
+
+    size_t n() const {
+        return dimensions_;
     }
 };
 

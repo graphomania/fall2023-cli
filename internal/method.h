@@ -28,7 +28,6 @@ public:
     minimal_with_path(Function* func, const Area& where) const = 0;
 
     Method* with_start(Point point) {
-        fmt::println(stderr, "with start {}", point);
         this->start_ = {std::move(point)};
         return this;
     }

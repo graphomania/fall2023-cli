@@ -91,9 +91,7 @@ public:
             double realX = experiment_.area->percentile(0, static_cast<double>(event->pos().x()) / width);
             double realY = experiment_.area->percentile(1, static_cast<double>(height - event->pos().y()) / height);
 
-            // experiment_.method->with_start({{realX, realY}});
             start_ = {{{realX, realY}}};
-            fmt::println("{} {} in {}", realX, realY, experiment_.area->to_string());
             callback_(true);
         }
     }

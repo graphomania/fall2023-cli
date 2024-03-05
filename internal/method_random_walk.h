@@ -16,7 +16,7 @@ class RandomWalk final : public Method {
     const double p_;
 
 public:
-    explicit RandomWalk(const Log& logger, const double delta = 0.1, const double p = 0.5,
+    explicit RandomWalk(const Log& logger, const double delta = 0.1, const double p = 0.2,
                         const double tolerance = 1e-5, const size_t min = 100, const size_t max = 10000)
         : Method(logger.with("RandomWalk")),
           min_(min), max_(max), tolerance_(tolerance),

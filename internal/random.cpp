@@ -6,7 +6,7 @@ double random::gen(const double min, const double max) {
 }
 
 std::mt19937_64& random::engine() {
-    static std::mt19937_64 engine_(0);
+    static std::mt19937_64 engine_(1);
     return engine_;
 }
 

@@ -268,6 +268,9 @@ int cli_app(int argc, char* argv[]) {
                         }
                         size = size_;
                     }
+                    if (size > cli.area.dimensions()) {
+                        cli.area = cli.area.extended(size - cli.area.dimensions());
+                    }
                     cli.functions.emplace_back(std::make_shared<RastriginFunction>(size));
                 },
                 {"-R", "--rastrigin"}, 2,
